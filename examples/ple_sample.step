@@ -1,0 +1,17 @@
+ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('OpenDatum Sample STEP AP214 Assembly'),'2;1');
+FILE_NAME('ple_sample.step','2026-11-22T00:00:00',('Jonathan Korstad'),('OpenDatum'),'OpenDatum','OpenDatum','');
+FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
+ENDSEC;
+DATA;
+#10=PRODUCT('BRKT-001','Lunar_Solar_Mount_Bracket','Ti-6Al-4V Structural Bracket',(#20));
+#11=PRODUCT('FAST-M8','M8_Titanium_Bolt','Grade 5 Fastener',(#20));
+#12=SI_UNIT(.MILLI.,.METRE.);
+#13=MANIFOLD_SOLID_BREP('BracketSolid',#14);
+#14=CLOSED_SHELL('BracketShell',(#15,#16));
+#15=ADVANCED_FACE('TopFace',(),#17,.T.);
+#16=ADVANCED_FACE('BottomFace',(),#18,.T.);
+#19=NEXT_ASSEMBLY_USAGE_OCCURRENCE('NAUO1','BoltMount','',#10,#11,$);
+ENDSEC;
+END-ISO-10303-21;

@@ -13,11 +13,26 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List
 
 from . import __version__
+from .cad_bridges import (
+    cad_capabilities,
+    export_usir_to_ifc4,
+    extract_dxf_takeoff,
+    inspect_step_file,
+)
 from .codes import CodesEngine
 from .materials import MaterialsDB
 from .solvers import EngineeringSolvers
 from .spatial import SpatialHub
 from .units import convert_unit
+
+
+def _ple_harness_import():
+    repo_root = Path(__file__).resolve().parents[2]
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
+    from ple.harness import triage_workspace, verify_deliverables
+
+    return triage_workspace, verify_deliverables
 
 
 class OpenDatumMCPServer:
@@ -114,6 +129,110 @@ class OpenDatumMCPServer:
                 "required": ["input_path"],
             },
             lambda a: self._get_spatial().analyze(a["input_path"], float(a.get("clearance", 0.05))),
+        )
+        self._register(
+            "spatial_merge_human_safe",
+            "Merge an incoming agent USIR document into a human-edited USIR document while preserving every human_locked node verbatim.",
+            {
+                "type": "object",
+                "properties": {
+                    "human_usir_path": {"type": "string"},
+                    "agent_usir_path": {"type": "string"},
+                    "output_usir_path": {"type": "string"},
+                },
+                "required": ["human_usir_path", "agent_usir_path", "output_usir_path"],
+            },
+            lambda a: self._get_spatial().merge(
+                a["human_usir_path"], a["agent_usir_path"], a["output_usir_path"]
+            ),
+        )
+        self._register(
+            "spatial_sync_engines",
+            "Hot-sync a USIR document simultaneously to Godot 4 (.tscn), Bevy (.ron), glTF 2.0, and/or OpenUSD (.usda) with clash summary.",
+            {
+                "type": "object",
+                "properties": {
+                    "usir_path": {"type": "string"},
+                    "godot_path": {"type": "string"},
+                    "bevy_path": {"type": "string"},
+                    "gltf_path": {"type": "string"},
+                    "usd_path": {"type": "string"},
+                },
+                "required": ["usir_path"],
+            },
+            lambda a: self._get_spatial().sync(
+                a["usir_path"],
+                godot_path=a.get("godot_path"),
+                bevy_path=a.get("bevy_path"),
+                gltf_path=a.get("gltf_path"),
+                usd_path=a.get("usd_path"),
+            ),
+        )
+
+        # ---- CAD/BIM Full Bridges & PLE Harness ----
+        self._register(
+            "cad_capabilities",
+            "List built-in zero-dep spatial formats and installed optional CAD/BIM bridges (ezdxf, IfcOpenShell, trimesh, OpenCASCADE/OCP).",
+            {"type": "object", "properties": {}},
+            lambda _a: cad_capabilities(),
+        )
+        self._register(
+            "cad_inspect_step",
+            "Inspect an ISO 10303-21 STEP (.stp/.step) CAD assembly (products, BREP solids, faces, units, plus exact OpenCASCADE volume when installed).",
+            {
+                "type": "object",
+                "properties": {"step_path": {"type": "string"}},
+                "required": ["step_path"],
+            },
+            lambda a: inspect_step_file(a["step_path"]),
+        )
+        self._register(
+            "cad_extract_dxf_takeoff",
+            "Extract a per-layer quantity takeoff (total line/polyline lengths, entity counts, annotations) from a DXF engineering drawing.",
+            {
+                "type": "object",
+                "properties": {"dxf_path": {"type": "string"}},
+                "required": ["dxf_path"],
+            },
+            lambda a: extract_dxf_takeoff(a["dxf_path"]),
+        )
+        self._register(
+            "cad_export_ifc",
+            "Export an OpenDatum USIR (.odir.json) document into a standards-compliant IFC4 STEP-SPF (.ifc) BIM file.",
+            {
+                "type": "object",
+                "properties": {
+                    "usir_path": {"type": "string"},
+                    "output_ifc_path": {"type": "string"},
+                },
+                "required": ["usir_path", "output_ifc_path"],
+            },
+            lambda a: export_usir_to_ifc4(a["usir_path"], a["output_ifc_path"]),
+        )
+        self._register(
+            "ple_workspace_triage",
+            "Scan a PLE or engineering project workspace and produce a token-efficient brief: file inventory, detected disciplines, spatial summaries, and suggested code clauses.",
+            {
+                "type": "object",
+                "properties": {"workspace_dir": {"type": "string"}},
+                "required": ["workspace_dir"],
+            },
+            lambda a: _ple_harness_import()[0](a["workspace_dir"]),
+        )
+        self._register(
+            "ple_verify_deliverables",
+            "Pre-submission QA gate verifying deliverables (.odir.json clash-free, valid JSON, non-empty DXF/IFC schemas) before grading or handoff.",
+            {
+                "type": "object",
+                "properties": {
+                    "workspace_dir": {"type": "string"},
+                    "min_clearance": {"type": "number", "default": 0.05},
+                },
+                "required": ["workspace_dir"],
+            },
+            lambda a: _ple_harness_import()[1](
+                a["workspace_dir"], float(a.get("min_clearance", 0.05))
+            ),
         )
 
         # ---- Materials Substrate ----

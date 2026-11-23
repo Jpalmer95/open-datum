@@ -6,6 +6,7 @@ pub mod adapters;
 pub mod clash;
 pub mod ir;
 pub mod mesh;
+pub mod sync;
 
 pub use adapters::{
     convert_file, detect_format, export_document, import_document, SpatialFormat,
@@ -17,3 +18,4 @@ pub use ir::{
     SpatialDocument, SpatialNode, Transform, UpAxis,
 };
 pub use mesh::{analyze_mesh, rebuild_document, tessellate_parametric};
+pub use sync::{merge_documents, MergeConflict, MergeReport};

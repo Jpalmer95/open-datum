@@ -1,0 +1,35 @@
+name: OpenDatum CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust-and-wasm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Run Rust workspace unit tests
+        run: cargo test --workspace
+      - name: Build release odatum CLI
+        run: cargo build --release --bin odatum
+      - name: Verify wasm32 WebAssembly build
+        run: cargo build --target wasm32-unknown-unknown -p opendatum-wasm --release
+
+  python-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build Rust odatum binary
+        run: cargo build --release --bin odatum
+      - name: Run Python E2E, PLE Harness, CAD Bridges & MCP tests
+        run: PYTHONPATH=python:. python3 -m unittest discover -s tests -v

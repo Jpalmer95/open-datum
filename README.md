@@ -67,7 +67,31 @@ python3 -m unittest discover -s tests -v
 python3 -m opendatum.mcp_server
 ```
 
-### 4. Example Workflows
+### 4. Live Human + Agent Co-Editing (Godot 4 / Bevy / WASM)
+```bash
+# Human-lock-safe merge of agent updates into a human-edited scene
+./target/release/odatum merge human.odir.json agent.odir.json merged.odir.json
+
+# Hot-sync USIR to Godot 4, Bevy, glTF 2.0, and OpenUSD (add --watch for live loop)
+./target/release/odatum sync merged.odir.json --godot out/scene.tscn --bevy out/scene.ron --gltf out/scene.gltf --usd out/scene.usda
+
+# Compile zero-upload WebAssembly build for browser / WebMCP viewers
+cargo build --target wasm32-unknown-unknown -p opendatum-wasm --release
+```
+- **Godot 4 Plugin:** Copy `integrations/godot/addons/opendatum_sync/` into your Godot project's `addons/` folder and enable **OpenDatum Live Sync**.
+- **Bevy Plugin:** Use `integrations/bevy/opendatum_bevy.rs` to poll `.odir.json` updates while protecting `human_locked` entities.
+
+### 5. PLE (Physical-Engineering's Last Exam) Offline Container Harness
+```bash
+# Build offline-ready PLE evaluation container
+docker build -f ple/Dockerfile -t opendatum-ple-harness .
+
+# Run in stdio MCP mode or local HTTP JSON-RPC mode
+python3 ple/serve.py           # stdio MCP
+python3 ple/serve.py --http    # http://127.0.0.1:8080/health
+```
+
+### 6. Example CLI Workflows
 ```bash
 # Inspect and rebuild a messy legacy STL/OBJ/DXF/IFC into clean USIR + Godot 4 + Bevy + 3MF
 ./target/release/odatum rebuild examples/legacy_bracket.obj out/bracket.odir.json --units m --up y

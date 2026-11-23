@@ -81,3 +81,25 @@ class SpatialHub:
 
     def analyze(self, input_path: str, clearance: float = 0.05) -> Dict[str, Any]:
         return self._run(["analyze", input_path, "--clearance", str(clearance)])
+
+    def merge(self, human_usir_path: str, agent_usir_path: str, output_usir_path: str) -> Dict[str, Any]:
+        return self._run(["merge", human_usir_path, agent_usir_path, output_usir_path])
+
+    def sync(
+        self,
+        usir_path: str,
+        godot_path: Optional[str] = None,
+        bevy_path: Optional[str] = None,
+        gltf_path: Optional[str] = None,
+        usd_path: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        args = ["sync", usir_path]
+        if godot_path:
+            args.extend(["--godot", godot_path])
+        if bevy_path:
+            args.extend(["--bevy", bevy_path])
+        if gltf_path:
+            args.extend(["--gltf", gltf_path])
+        if usd_path:
+            args.extend(["--usd", usd_path])
+        return self._run(args)

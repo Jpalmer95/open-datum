@@ -260,5 +260,112 @@ class TestRustSpatialHubAndMCP(unittest.TestCase):
         self.assertEqual(payload["clash_report"]["hard_clashes"], 1)
 
 
+class TestPLEHarnessCADBridgesAndLiveSync(unittest.TestCase):
+    def setUp(self):
+        self.hub = SpatialHub()
+        self.mcp = OpenDatumMCPServer()
+
+    def test_step_dxf_and_ifc4_roundtrip(self):
+        from opendatum.cad_bridges import (
+            export_usir_to_ifc4,
+            extract_dxf_takeoff,
+            inspect_step_file,
+        )
+
+        step_info = inspect_step_file(REPO_ROOT / "examples" / "ple_sample.step")
+        self.assertEqual(len(step_info["products"]), 2)
+        self.assertEqual(step_info["solid_brep_count"], 2)
+        self.assertEqual(step_info["assembly_links"], 1)
+
+        dxf_info = extract_dxf_takeoff(REPO_ROOT / "examples" / "ple_sample.dxf")
+        self.assertAlmostEqual(dxf_info["total_length_by_layer"]["S-BEAM"], 6.0, places=3)
+        self.assertAlmostEqual(dxf_info["total_length_by_layer"]["M-HVAC-SUPPLY"], 5.0, places=3)
+        self.assertEqual(len(dxf_info["annotations"]), 1)
+
+        with tempfile.TemporaryDirectory() as td:
+            out_ifc = Path(td) / "exported.ifc"
+            res = export_usir_to_ifc4(REPO_ROOT / "examples" / "mep_building.odir.json", out_ifc)
+            self.assertEqual(res["elements_exported"], 3)
+            # Round-trip back into Rust USIR inspector!
+            inspected = self.hub.inspect(str(out_ifc))
+            self.assertGreaterEqual(inspected["node_count"], 4)  # 3 elements + storey
+
+    def test_human_lock_safe_merge_and_multi_engine_sync(self):
+        with tempfile.TemporaryDirectory() as td:
+            tdp = Path(td)
+            src = REPO_ROOT / "examples" / "mep_building.odir.json"
+            human_doc = json.loads(src.read_text(encoding="utf-8"))
+            agent_doc = json.loads(src.read_text(encoding="utf-8"))
+
+            # Agent tries to move human-locked electrical panel AND lowers duct to fix clash!
+            for n in agent_doc["nodes"]:
+                if n["id"] == "elec_panel_lp1":
+                    n["transform"]["position"] = [99.0, 99.0, 99.0]
+                    n["provenance"]["human_locked"] = False
+                elif n["id"] == "mech_duct_supply_01":
+                    n["parametric"]["start"][1] = 2.6
+                    n["parametric"]["end"][1] = 2.6
+
+            human_p = tdp / "human.odir.json"
+            agent_p = tdp / "agent.odir.json"
+            merged_p = tdp / "merged.odir.json"
+            human_p.write_text(json.dumps(human_doc), encoding="utf-8")
+            agent_p.write_text(json.dumps(agent_doc), encoding="utf-8")
+
+            mres = self.hub.merge(str(human_p), str(agent_p), str(merged_p))
+            self.assertEqual(mres["merge_report"]["preserved_human_locked"], ["elec_panel_lp1"])
+            self.assertEqual(len(mres["merge_report"]["conflicts"]), 1)
+
+            merged = json.loads(merged_p.read_text(encoding="utf-8"))
+            panel = next(n for n in merged["nodes"] if n["id"] == "elec_panel_lp1")
+            self.assertEqual(panel["transform"]["position"], [-2.8, 1.5, -2.2])
+            self.assertTrue(panel["provenance"]["human_locked"])
+
+            # Sync merged clash-free model to Godot 4, Bevy, glTF, and OpenUSD in one shot!
+            sres = self.hub.sync(
+                str(merged_p),
+                godot_path=str(tdp / "scene.tscn"),
+                bevy_path=str(tdp / "scene.ron"),
+                gltf_path=str(tdp / "scene.gltf"),
+                usd_path=str(tdp / "scene.usda"),
+            )
+            self.assertEqual(sres["hard_clashes"], 0)
+            self.assertEqual(len(sres["exported"]), 4)
+
+    def test_ple_triage_and_verify_via_mcp(self):
+        triage_resp = self.mcp.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 10,
+                "method": "tools/call",
+                "params": {
+                    "name": "ple_workspace_triage",
+                    "arguments": {"workspace_dir": str(REPO_ROOT / "examples")},
+                },
+            }
+        )
+        self.assertFalse(triage_resp["result"]["isError"])
+        triage = json.loads(triage_resp["result"]["content"][0]["text"])
+        self.assertGreaterEqual(len(triage["spatial_summaries"]), 3)
+        disc_names = {d["discipline"] for d in triage["detected_disciplines"]}
+        self.assertTrue({"structural", "mechanical"}.issubset(disc_names))
+
+        # Verify deliverables catches the deliberate clash in examples/mep_building.odir.json
+        ver_resp = self.mcp.handle_request(
+            {
+                "jsonrpc": "2.0",
+                "id": 11,
+                "method": "tools/call",
+                "params": {
+                    "name": "ple_verify_deliverables",
+                    "arguments": {"workspace_dir": str(REPO_ROOT / "examples")},
+                },
+            }
+        )
+        ver = json.loads(ver_resp["result"]["content"][0]["text"])
+        self.assertFalse(ver["overall_pass"])
+        self.assertGreaterEqual(ver["error_count"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

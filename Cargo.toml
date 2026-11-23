@@ -2,6 +2,7 @@
 members = [
     "crates/opendatum-core",
     "crates/opendatum-cli",
+    "crates/opendatum-wasm",
 ]
 resolver = "2"
 

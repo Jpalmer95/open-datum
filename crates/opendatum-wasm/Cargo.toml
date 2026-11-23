@@ -1,0 +1,14 @@
+[package]
+name = "opendatum-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Zero-upload WebAssembly build of OpenDatum Universal Spatial Core for browser viewers and WebMCP."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+opendatum-core = { path = "../opendatum-core" }
+serde_json = "1.0"

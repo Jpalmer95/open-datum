@@ -2,8 +2,14 @@
 and Deterministic Physical Engineering Toolkit.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
+from .cad_bridges import (
+    cad_capabilities,
+    export_usir_to_ifc4,
+    extract_dxf_takeoff,
+    inspect_step_file,
+)
 from .codes import CodesEngine
 from .materials import MaterialsDB
 from .solvers import EngineeringSolvers
@@ -16,5 +22,9 @@ __all__ = [
     "EngineeringSolvers",
     "MaterialsDB",
     "SpatialHub",
+    "cad_capabilities",
     "convert_unit",
+    "export_usir_to_ifc4",
+    "extract_dxf_takeoff",
+    "inspect_step_file",
 ]

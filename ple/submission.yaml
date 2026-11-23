@@ -1,0 +1,49 @@
+# Kaggle PLE (Physical-Engineering's Last Exam) Agent Harness Manifest
+name: opendatum-ple-harness
+version: "0.2.0"
+license: Apache-2.0
+description: >
+  OpenDatum universal spatial hub + progressive-disclosure codes + first-principles
+  materials & deterministic engineering solver harness for Physical-Engineering's Last Exam.
+
+runtime:
+  offline_capable: true
+  entrypoint: "python3 ple/serve.py"
+  mcp_stdio_entrypoint: "python3 -m opendatum.mcp_server"
+  max_task_timeout_seconds: 21600
+
+capabilities:
+  disciplines:
+    - structural
+    - civil
+    - electrical
+    - mechanical
+    - fabrication
+    - aerospace_isru
+  tools:
+    - ple_workspace_triage
+    - ple_verify_deliverables
+    - spatial_inspect
+    - spatial_convert
+    - spatial_rebuild_legacy
+    - spatial_merge_human_safe
+    - spatial_analyze_and_clash
+    - cad_inspect_step
+    - cad_extract_dxf_takeoff
+    - cad_export_ifc
+    - materials_search
+    - materials_get
+    - materials_compare
+    - codes_resolve_jurisdiction
+    - codes_search
+    - codes_get_clause
+    - solve_structural_load_combos
+    - solve_structural_beam
+    - solve_civil_manning_flow
+    - solve_civil_bearing_capacity
+    - solve_electrical_feeder
+    - solve_electrical_solar_busbar
+    - solve_mechanical_pipe_flow
+    - solve_mechanical_duct
+    - solve_thermal_envelope
+    - convert_units

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendatum"
+version = "0.1.0"
+description = "Universal open-source spatial hub, first-principles materials & codes substrate, and deterministic physical engineering MCP toolkit."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [{name = "Jonathan Korstad"}]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+cad = ["ezdxf>=1.3", "trimesh>=4.4"]
+bim = ["ifcopenshell>=0.8"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+opendatum = "opendatum.cli:main"
+opendatum-mcp = "opendatum.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["python"]

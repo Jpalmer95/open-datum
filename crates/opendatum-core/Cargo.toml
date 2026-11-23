@@ -1,0 +1,11 @@
+[package]
+name = "opendatum-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Universal Spatial Intermediate Representation (USIR), legacy mesh/CAD rebuilder, clash detection, and multi-format adapters."
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

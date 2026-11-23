@@ -1,0 +1,15 @@
+[package]
+name = "opendatum-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "CLI for OpenDatum universal spatial hub, converter, rebuilder, and clash analyzer."
+
+[[bin]]
+name = "odatum"
+path = "src/main.rs"
+
+[dependencies]
+opendatum-core = { path = "../opendatum-core" }
+serde_json = "1.0"

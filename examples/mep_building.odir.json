@@ -1,0 +1,98 @@
+{
+  "schema_version": "0.1.0",
+  "name": "MEP_Structural_Coordination_Bay",
+  "datum": {
+    "length_unit": "m",
+    "up_axis": "Y",
+    "right_handed": true,
+    "environment": "earth_sea_level",
+    "gravity_m_s2": [0.0, -9.80665, 0.0]
+  },
+  "nodes": [
+    {
+      "id": "struct_beam_b1",
+      "name": "W12x40_Primary_Girder",
+      "discipline": "structural",
+      "role": "beam",
+      "transform": {
+        "position": [0.0, 3.2, 0.0],
+        "rotation_xyzw": [0.0, 0.0, 0.0, 1.0],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "parametric": {
+        "kind": "box",
+        "size": [6.0, 0.31, 0.20]
+      },
+      "material_id": "steel_a992",
+      "physics": {
+        "kind": "static",
+        "mass_kg": 357.0,
+        "static_friction": 0.74,
+        "restitution": 0.05,
+        "collider_hint": "box"
+      },
+      "provenance": {
+        "source_format": "usir",
+        "human_locked": false
+      }
+    },
+    {
+      "id": "mech_duct_supply_01",
+      "name": "AHU1_Supply_Trunk",
+      "discipline": "mechanical",
+      "role": "duct",
+      "transform": {
+        "position": [0.0, 0.0, 0.0],
+        "rotation_xyzw": [0.0, 0.0, 0.0, 1.0],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "parametric": {
+        "kind": "duct_run",
+        "start": [0.5, 3.18, -2.5],
+        "end": [0.5, 3.18, 2.5],
+        "width": 0.45,
+        "height": 0.30
+      },
+      "material_id": "steel_a36",
+      "physics": {
+        "kind": "static",
+        "mass_kg": 85.0,
+        "static_friction": 0.5,
+        "restitution": 0.05,
+        "collider_hint": "box"
+      },
+      "provenance": {
+        "source_format": "usir",
+        "human_locked": false
+      }
+    },
+    {
+      "id": "elec_panel_lp1",
+      "name": "Panelboard_LP1_HandPlaced",
+      "discipline": "electrical",
+      "role": "electrical_equipment",
+      "transform": {
+        "position": [-2.8, 1.5, -2.2],
+        "rotation_xyzw": [0.0, 0.0, 0.0, 1.0],
+        "scale": [1.0, 1.0, 1.0]
+      },
+      "parametric": {
+        "kind": "box",
+        "size": [0.55, 1.20, 0.20]
+      },
+      "material_id": "steel_a36",
+      "physics": {
+        "kind": "static",
+        "mass_kg": 62.0,
+        "static_friction": 0.6,
+        "restitution": 0.05,
+        "collider_hint": "box"
+      },
+      "provenance": {
+        "source_format": "usir",
+        "human_locked": true,
+        "notes": ["Architect-verified NEC 110.26 working clearance"]
+      }
+    }
+  ]
+}

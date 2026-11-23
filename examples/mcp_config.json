@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "opendatum": {
+      "command": "python3",
+      "args": ["-m", "opendatum.mcp_server"],
+      "env": {
+        "PYTHONPATH": "/home/jonathan/dev/open-datum/python"
+      },
+      "offline_ready": true,
+      "notes": "Drop-in offline MCP server for PLE containers, Claude Code, Codex, Hermes, Antigravity, and Godot/Bevy workflows."
+    }
+  }
+}

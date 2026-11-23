@@ -1,0 +1,307 @@
+{
+  "schema_version": "0.1.0",
+  "jurisdictions": [
+    {
+      "code": "INTL",
+      "name": "International First-Principles & ISO/IEC/ASHRAE/NFPA Baseline",
+      "parent": null,
+      "adopted_standards": ["ISO 2394", "IEC 60364", "ASHRAE 62.1", "ASHRAE 90.1", "NFPA 13", "ISO/ASTM 52910"]
+    },
+    {
+      "code": "US",
+      "name": "United States Federal / Model Codes (IBC/ASCE 7/AISC/ACI/NEC/IMC/IPC/OSHA)",
+      "parent": "INTL",
+      "adopted_standards": ["IBC 2024", "ASCE 7-22", "AISC 360-22", "ACI 318-19", "NEC NFPA 70-2023", "IMC 2024", "IPC 2024", "OSHA 1926"]
+    },
+    {
+      "code": "EU",
+      "name": "European Union — Structural Eurocodes & EN Standards",
+      "parent": "INTL",
+      "adopted_standards": ["EN 1990", "EN 1991", "EN 1992", "EN 1993", "EN 1997", "EN 1998", "HD 60364"]
+    },
+    {
+      "code": "US-CA",
+      "name": "California (CBC Title 24, CEC, CMC, CPC, High Seismic)",
+      "parent": "US",
+      "adopted_standards": ["CBC 2025", "CA Title 24 Part 6 Energy", "CEC", "ASCE 7 Seismic Design Cat D/E"]
+    },
+    {
+      "code": "US-FL",
+      "name": "Florida Building Code (FBC / HVHZ High-Velocity Hurricane Zone)",
+      "parent": "US",
+      "adopted_standards": ["FBC 8th Ed", "HVHZ Wind Design >= 175 mph", "ASCE 7 Wind"]
+    },
+    {
+      "code": "US-TX",
+      "name": "Texas Municipal Adoptions (IBC/NEC + Gulf Coast Windstorm)",
+      "parent": "US",
+      "adopted_standards": ["IBC", "NEC 2023", "TDLR TAS / ADA", "TDI Coastal Windstorm"]
+    },
+    {
+      "code": "US-NY",
+      "name": "New York State / NYC Construction Codes",
+      "parent": "US",
+      "adopted_standards": ["NYC BC 2022", "NYCECC", "NEC with NYC Amendments"]
+    },
+    {
+      "code": "SPACE-NASA",
+      "name": "NASA / Off-Earth Spaceflight & Surface Habitat Standards",
+      "parent": "INTL",
+      "adopted_standards": ["NASA-STD-5001B", "NASA-STD-3001", "NASA-STD-5005", "AIAA S-080"]
+    }
+  ],
+  "clauses": [
+    {
+      "id": "US-ASCE7-2.3.1",
+      "jurisdiction": "US",
+      "discipline": "structural",
+      "standard": "ASCE 7-22 Section 2.3.1",
+      "title": "LRFD Basic Load Combinations (Strength Design)",
+      "summary": "Factored ultimate load combinations for dead (D), live (L), roof live/snow (Lr/S), wind (W), and seismic (E) loads.",
+      "details": "Primary governing LRFD combinations: (1) 1.4D; (2) 1.2D + 1.6L + 0.5(Lr or S); (3) 1.2D + 1.6(Lr or S) + (L or 0.5W); (4) 1.2D + 1.0W + L + 0.5(Lr or S); (5) 1.2D + 1.0E + L + 0.2S; (6) 0.9D + 1.0W; (7) 0.9D + 1.0E. Always verify uplift/overturning with 0.9D.",
+      "formula": "U = max(1.4D, 1.2D+1.6L+0.5S, 1.2D+1.6S+L, 1.2D+1.0W+L+0.5S, 0.9D+1.0W, 1.2D+1.0E+L+0.2S, 0.9D+1.0E)",
+      "parameters": {"phi_flexure_steel": 0.90, "phi_shear_steel": 0.90, "phi_flexure_concrete": 0.90},
+      "tags": ["lrfd", "load combinations", "dead load", "live load", "wind", "seismic", "asce7"]
+    },
+    {
+      "id": "US-IBC-1604.3",
+      "jurisdiction": "US",
+      "discipline": "structural",
+      "standard": "IBC Table 1604.3",
+      "title": "Serviceability Deflection Limits for Beams & Floors",
+      "summary": "Maximum allowable elastic deflections under live load (L/360 for floors) and total load (L/240).",
+      "details": "Floor members: Live load deflection <= L/360; Dead+Live <= L/240. Roof members supporting plaster ceilings: Live <= L/360, Total <= L/240; non-plaster ceilings: Live <= L/240, Total <= L/180. Exterior walls with brittle finishes: Wind <= L/240 (or L/360 for masonry veneer).",
+      "formula": "delta_live <= L / 360; delta_total <= L / 240",
+      "parameters": {"floor_live_ratio": 360, "floor_total_ratio": 240, "roof_live_ratio": 240},
+      "tags": ["deflection", "serviceability", "beam", "floor", "roof", "L/360", "L/240"]
+    },
+    {
+      "id": "US-AISC360-F2",
+      "jurisdiction": "US",
+      "discipline": "structural",
+      "standard": "AISC 360 Chapter F & E",
+      "title": "Structural Steel Flexure, Shear & Column Buckling",
+      "summary": "Yielding plastic moment Mn = Fy*Zx (phi_b=0.90), Euler/inelastic column buckling (phi_c=0.90), and web shear Vn = 0.6*Fy*Aw*Cv1.",
+      "details": "For laterally braced compact doubly symmetric I-shapes, design flexural strength phi_b*Mn = 0.90 * Fy * Zx (or conservatively 0.90 * Fy * Sx for elastic check). For compression members, compute KL/r and Fe = pi^2*E / (KL/r)^2; if KL/r <= 4.71*sqrt(E/Fy), Fcr = (0.658^(Fy/Fe))*Fy else Fcr = 0.877*Fe.",
+      "formula": "phi*Mn = 0.90 * Fy * Zx; Fe = pi^2 * E / (KL/r)^2",
+      "parameters": {"phi_b": 0.90, "phi_c": 0.90, "phi_v": 1.00},
+      "tags": ["steel", "beam", "column", "buckling", "aisc", "flexure", "shear"]
+    },
+    {
+      "id": "US-ACI318-20.5",
+      "jurisdiction": "US",
+      "discipline": "structural",
+      "standard": "ACI 318 Table 20.5.1.3.1",
+      "title": "Minimum Concrete Cover for Reinforcement",
+      "summary": "Minimum clear concrete cover to protect rebar from corrosion and fire: 3 in cast against earth, 2 in exposed to weather (#6-#18), 0.75 in interior slabs.",
+      "details": "Cast against and permanently in contact with ground: 75 mm (3 in). Exposed to weather or earth (#6 through #18 bars): 50 mm (2 in); #5 and smaller: 38 mm (1.5 in). Not exposed to weather or earth — slabs/walls: 20 mm (0.75 in); beams/columns: 40 mm (1.5 in).",
+      "formula": "cover_min_mm in {75 (earth), 50 (weather), 40 (interior beam/col), 20 (interior slab)}",
+      "parameters": {"earth_mm": 75.0, "weather_large_bar_mm": 50.0, "interior_beam_mm": 40.0, "interior_slab_mm": 20.0},
+      "tags": ["concrete", "rebar", "cover", "aci318", "footing", "slab", "durability"]
+    },
+    {
+      "id": "EU-EN1990-6.4",
+      "jurisdiction": "EU",
+      "discipline": "structural",
+      "standard": "Eurocode EN 1990",
+      "title": "Ultimate Limit State (ULS) Fundamental Load Combination",
+      "summary": "European partial factor ULS design: 1.35*Gk + 1.50*Qk,1 + sum(1.50*psi_0*Qk,i).",
+      "details": "Permanent actions Gk use partial factor gamma_G = 1.35 (unfavourable) or 1.00 (favourable). Leading variable action Qk,1 uses gamma_Q = 1.50. Accompanying variable actions apply combination factor psi_0 (typically 0.7 for offices, 0.6 for wind, 0.5 for snow).",
+      "formula": "Ed = 1.35*Gk + 1.50*Qk1 + sum(1.50*psi0*Qki)",
+      "parameters": {"gamma_G_unfav": 1.35, "gamma_G_fav": 1.00, "gamma_Q": 1.50},
+      "tags": ["eurocode", "en1990", "uls", "load combination", "europe"]
+    },
+    {
+      "id": "US-CA-CBC-SEISMIC",
+      "jurisdiction": "US-CA",
+      "discipline": "structural",
+      "standard": "CBC Title 24 / ASCE 7 Ch. 12",
+      "title": "California High-Seismic Drift & Ductility Detailing",
+      "summary": "Story drift limits (0.020*hsx for Risk Cat II), non-structural MEP seismic bracing, and special moment/braced frame detailing.",
+      "details": "In California SDC D/E/F, structural frames must satisfy story drift <= 0.020*h_sx (Risk Cat I/II) or 0.015*h_sx (Risk Cat III) or 0.010*h_sx (Risk Cat IV). Mechanical/electrical equipment >400 lb or piping/ducts above exemptions require seismic lateral & longitudinal sway bracing per ASCE 7 Ch. 13.",
+      "formula": "Delta_a <= 0.020 * h_sx (Risk Cat II); Fp = (0.4*ap*SDS*Wp)/(Rp/Ip)*(1+2z/h)",
+      "parameters": {"drift_cat2": 0.020, "drift_cat4": 0.010},
+      "tags": ["california", "seismic", "drift", "bracing", "cbc", "mep seismic"]
+    },
+    {
+      "id": "US-FL-FBC-HVHZ",
+      "jurisdiction": "US-FL",
+      "discipline": "structural",
+      "standard": "Florida Building Code HVHZ",
+      "title": "High-Velocity Hurricane Zone Wind Pressure & Impact Glazing",
+      "summary": "Ultimate wind speeds >= 175 mph (Miami-Dade/Broward) with mandatory wind-borne debris impact protection.",
+      "details": "Structures in Florida HVHZ must design C&C and MWFRS for V_ult >= 175 mph (Risk Cat II) and protect all glazed openings against large-missile impact or design as partially enclosed with elevated internal pressure coefficient GCpi = +/-0.55.",
+      "formula": "qz = 0.00256 * Kz * Kzt * Kd * Ke * V^2 (psf, V in mph)",
+      "parameters": {"v_ult_mph_min": 175.0, "gcpi_partially_enclosed": 0.55},
+      "tags": ["florida", "hurricane", "wind", "hvhz", "glazing", "uplift"]
+    },
+    {
+      "id": "US-OSHA-1926-P",
+      "jurisdiction": "US",
+      "discipline": "civil",
+      "standard": "OSHA 29 CFR 1926 Subpart P",
+      "title": "Excavation Sloping, Benching & Shoring Requirements",
+      "summary": "Protective systems required for excavations >= 5 ft (1.52 m) deep; max allowable slopes: Type A 0.75H:1V (53°), Type B 1H:1V (45°), Type C 1.5H:1V (34°).",
+      "details": "Excavations >= 5 ft require shoring, shielding, or sloping unless in stable rock (90°). Excavations > 20 ft (6.1 m) MUST be designed by a registered professional engineer. Spoil piles must be kept >= 2 ft (0.61 m) from trench edge.",
+      "formula": "slope_H_to_V: Rock=0, TypeA=0.75, TypeB=1.0, TypeC=1.5; PE_required if depth > 6.1 m",
+      "parameters": {"protective_depth_m": 1.524, "pe_design_depth_m": 6.096, "spoil_setback_m": 0.61},
+      "tags": ["excavation", "shoring", "trench", "osha", "soil", "geotech", "slope"]
+    },
+    {
+      "id": "INTL-CIVIL-TERZAGHI",
+      "jurisdiction": "INTL",
+      "discipline": "civil",
+      "standard": "Terzaghi / Meyerhof Shallow Foundation Bearing",
+      "title": "Shallow Foundation Ultimate & Allowable Bearing Capacity",
+      "summary": "Ultimate bearing q_ult = c*Nc + q*Nq + 0.5*gamma*B*Ngamma with typical Factor of Safety FS >= 3.0.",
+      "details": "Verify both bearing capacity (q_applied <= q_ult / FS, where FS >= 3.0 for dead+live) and serviceability settlement (typically <= 25 mm total, <= 19 mm differential for isolated footings). Adjust gamma to submerged unit weight gamma' below groundwater table.",
+      "formula": "q_ult = c*Nc*sc + q*Nq*sq + 0.5*gamma*B*Ngamma*sgamma; q_allow = q_ult / 3.0",
+      "parameters": {"fs_bearing_min": 3.0, "max_settlement_mm": 25.0},
+      "tags": ["bearing capacity", "foundation", "footing", "settlement", "terzaghi", "soil"]
+    },
+    {
+      "id": "INTL-CIVIL-DRAINAGE",
+      "jurisdiction": "INTL",
+      "discipline": "civil",
+      "standard": "Rational Method & Manning Open-Channel Hydraulics",
+      "title": "Stormwater Runoff & Gravity Pipe/Channel Sizing",
+      "summary": "Peak runoff Q = C*i*A; gravity flow Q = (1/n)*A*R^(2/3)*S^(1/2) with self-cleansing velocity >= 0.6 m/s (2 ft/s).",
+      "details": "Storm sewer minimum velocity should be >= 0.6–0.9 m/s (2–3 ft/s) to prevent sediment deposition and <= 3.0–4.5 m/s (10–15 ft/s) to prevent pipe abrasion. Minimum cover over storm pipes under traffic is typically >= 0.6–0.9 m (2–3 ft) or below frost line.",
+      "formula": "Q_manning = (1/n) * A * R^(2/3) * S^(1/2); Q_rational = C * i * A",
+      "parameters": {"v_min_m_s": 0.6, "v_max_m_s": 3.5, "n_pvc": 0.009, "n_concrete": 0.013},
+      "tags": ["drainage", "stormwater", "manning", "hydraulics", "culvert", "rational method", "grading"]
+    },
+    {
+      "id": "US-ADA-405",
+      "jurisdiction": "US",
+      "discipline": "civil",
+      "standard": "ADA 2010 Standards Section 405",
+      "title": "Accessible Ramp Slope, Cross-Slope & Landings",
+      "summary": "Maximum running slope 1:12 (8.33%), max cross-slope 1:48 (2.08%), max rise 30 in (760 mm) per run.",
+      "details": "Accessible site routes without handrails max slope is 1:20 (5.0%). Ramps > 1:20 up to 1:12 require 36 in (915 mm) minimum clear width between handrails and level 60x60 in (1525 mm) landings every 30 in of vertical rise.",
+      "formula": "slope <= 1/12 (8.33%); cross_slope <= 1/48 (2.08%); max_rise_per_run = 0.762 m",
+      "parameters": {"max_running_slope": 0.0833, "max_cross_slope": 0.0208, "max_rise_m": 0.762},
+      "tags": ["ada", "ramp", "grading", "slope", "site", "accessibility"]
+    },
+    {
+      "id": "US-NEC-210.19",
+      "jurisdiction": "US",
+      "discipline": "electrical",
+      "standard": "NEC (NFPA 70) Art. 210.19 & 215.2",
+      "title": "Continuous Load 125% Sizing & Voltage Drop Recommendations",
+      "summary": "Size overcurrent devices and conductors for 125% of continuous loads (>=3 hrs) + 100% non-continuous; keep voltage drop <= 3% branch / <= 5% total.",
+      "details": "Feeder and branch-circuit conductors must have ampacity >= 1.25 * I_continuous + 1.00 * I_noncontinuous after ambient temperature (Table 310.15(B)(1)) and conduit bundling (>3 current-carrying conductors, Table 310.15(C)(1)) derating. Informational Note: keep branch voltage drop <= 3% and combined feeder + branch <= 5%.",
+      "formula": "I_design = 1.25*I_cont + I_noncont; VD_1ph = 2*I*L*R/1000; VD_3ph = sqrt(3)*I*L*R/1000",
+      "parameters": {"continuous_factor": 1.25, "max_branch_vd_pct": 3.0, "max_total_vd_pct": 5.0},
+      "tags": ["nec", "voltage drop", "feeder", "branch circuit", "continuous load", "ampacity", "conductor"]
+    },
+    {
+      "id": "US-NEC-CH9-T1",
+      "jurisdiction": "US",
+      "discipline": "electrical",
+      "standard": "NEC Chapter 9 Table 1",
+      "title": "Conduit & Tubing Percentage Fill Limits",
+      "summary": "Maximum cross-sectional fill: 53% for 1 conductor, 31% for 2 conductors, 40% for 3 or more conductors.",
+      "details": "To prevent thermal buildup and cable pulling damage (jamming), total conductor cross-sectional area (including insulation) must not exceed 53% (1 wire), 31% (2 wires), or 40% (3+ wires) of conduit internal area. Nipples <= 24 in (600 mm) permit up to 60% fill.",
+      "formula": "fill_pct = (sum_wire_areas / conduit_internal_area) * 100 <= {53, 31, 40}",
+      "parameters": {"fill_1_pct": 53.0, "fill_2_pct": 31.0, "fill_3plus_pct": 40.0, "nipple_pct": 60.0},
+      "tags": ["nec", "conduit fill", "raceway", "cable", "wiring"]
+    },
+    {
+      "id": "US-NEC-705.12",
+      "jurisdiction": "US",
+      "discipline": "electrical",
+      "standard": "NEC Section 705.12(B)(3)(2)",
+      "title": "Solar PV / ESS Load-Side Interconnection 120% Busbar Rule",
+      "summary": "Main breaker rating + 125% of inverter max output current must not exceed 120% of panelboard busbar rating when backfed at opposite end.",
+      "details": "For load-side solar PV/battery interconnections where the backfed breaker is located at the opposite end of the busbar from the main supply breaker: (I_main_ocpd + I_pv_ocpd) <= 1.20 * I_busbar, where I_pv_ocpd >= 1.25 * I_inverter_max. Alternative: supply-side tap (705.11) or sum-of-breakers <= 100% busbar.",
+      "formula": "I_main_breaker + I_pv_breaker <= 1.20 * I_busbar; I_pv_breaker >= 1.25 * I_inv_max",
+      "parameters": {"busbar_multiplier": 1.20, "inverter_continuous_factor": 1.25},
+      "tags": ["solar", "pv", "interconnection", "busbar", "120% rule", "nec 705", "inverter"]
+    },
+    {
+      "id": "INTL-IEC-60364-5-52",
+      "jurisdiction": "EU",
+      "discipline": "electrical",
+      "standard": "IEC 60364-5-52",
+      "title": "International Low-Voltage Cable Sizing & Voltage Drop",
+      "summary": "IEC voltage drop guidelines: 3% lighting / 5% other uses from public LV supply (6%/8% from private transformer).",
+      "details": "Metric conductor cross-sections (1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120 mm^2) selected by installation method (A1–G) and ambient/grouping correction factors.",
+      "formula": "VD_pct <= 3% (lighting) or 5% (power)",
+      "parameters": {"lighting_vd_pct": 3.0, "power_vd_pct": 5.0},
+      "tags": ["iec", "europe", "metric cable", "voltage drop", "electrical"]
+    },
+    {
+      "id": "INTL-ASHRAE-62.1",
+      "jurisdiction": "INTL",
+      "discipline": "mechanical",
+      "standard": "ASHRAE 62.1 Ventilation Rate Procedure",
+      "title": "Outdoor Air Ventilation Rates for Acceptable IAQ",
+      "summary": "Breathing zone outdoor airflow Vbz = Rp*Pz + Ra*Az (e.g., Office: 5 CFM/person + 0.06 CFM/ft^2).",
+      "details": "Combine occupant component (Rp * Pz) and building floor-area component (Ra * Az), then divide by zone air distribution effectiveness Ez (1.0 for ceiling cool supply, 0.8 for ceiling warm supply). Typical offices: Rp=5 CFM/p (2.5 L/s/p), Ra=0.06 CFM/ft^2 (0.3 L/s/m^2). Classrooms: Rp=10 CFM/p, Ra=0.12 CFM/ft^2.",
+      "formula": "Vbz = Rp*Pz + Ra*Az; Voz = Vbz / Ez",
+      "parameters": {"office_rp_l_s_p": 2.5, "office_ra_l_s_m2": 0.30, "ez_cooling": 1.0, "ez_heating_ceiling": 0.8},
+      "tags": ["hvac", "ventilation", "ashrae", "airflow", "cfm", "iaq", "mechanical"]
+    },
+    {
+      "id": "INTL-ASHRAE-DUCT",
+      "jurisdiction": "INTL",
+      "discipline": "mechanical",
+      "standard": "ASHRAE Fundamentals Ch. 21 Duct Design",
+      "title": "Equal-Friction HVAC Duct Sizing & Velocity Noise Limits",
+      "summary": "Target friction rate 0.8–1.0 Pa/m (0.08–0.10 in.wg/100 ft); keep branch velocity <= 4–5 m/s and main trunk <= 7.5–10 m/s to limit noise.",
+      "details": "Convert rectangular ducts (a x b) to Huebscher equivalent circular diameter: De = 1.30 * (a*b)^0.625 / (a+b)^0.25. Maintain aspect ratio a/b <= 4:1 to minimize friction and sheet-metal cost. Keep minimum 50 mm clearance from structural steel and electrical cable trays.",
+      "formula": "De = 1.30 * (a*b)^0.625 / (a+b)^0.25; dP/L = (f/De) * (rho*v^2 / 2)",
+      "parameters": {"max_aspect_ratio": 4.0, "target_friction_pa_m": 0.8, "max_trunk_vel_m_s": 9.0, "max_branch_vel_m_s": 4.5},
+      "tags": ["hvac", "duct", "equal friction", "huebscher", "velocity", "noise", "clash"]
+    },
+    {
+      "id": "INTL-FLUID-DARCY",
+      "jurisdiction": "INTL",
+      "discipline": "mechanical",
+      "standard": "Darcy-Weisbach & Swamee-Jain Pipe Hydraulics",
+      "title": "Closed-Conduit Pipe Head Loss & Velocity Limits",
+      "summary": "Head loss hf = f*(L/D)*(v^2/2g); hydronic chilled/hot water pipe velocity typically 0.6–2.4 m/s (2–8 ft/s) to balance noise, erosion, and pumping power.",
+      "details": "Compute Reynolds number Re = rho*v*D/mu. For laminar flow (Re < 2300), f = 64/Re. For turbulent flow, Swamee-Jain explicitly approximates Colebrook-White within 1%. Keep copper domestic hot water velocity <= 1.5 m/s (5 ft/s) to prevent erosion-corrosion.",
+      "formula": "hf = f * (L/D) * (v^2 / (2*g)); Re = rho * v * D / mu",
+      "parameters": {"hydronic_v_max_m_s": 2.4, "copper_dhw_v_max_m_s": 1.5},
+      "tags": ["pipe", "hydronics", "pressure drop", "darcy-weisbach", "reynolds", "pump", "fluid"]
+    },
+    {
+      "id": "US-IPC-704.1",
+      "jurisdiction": "US",
+      "discipline": "plumbing",
+      "standard": "IPC Table 704.1",
+      "title": "Sanitary Drainage Horizontal Pipe Minimum Slope",
+      "summary": "Minimum horizontal drainage slope: 2% (1/4 in/ft) for pipes <= 2.5 in, 1% (1/8 in/ft) for 3–6 in, 0.5% (1/16 in/ft) for >= 8 in.",
+      "details": "Proper gravity slope maintains scouring velocity (~0.6 m/s) so solids travel with liquid rather than stranding. Avoid excessive slope on small lines without venting checks.",
+      "formula": "slope >= 0.0208 (<=65mm), >= 0.0104 (75-150mm), >= 0.0052 (>=200mm)",
+      "parameters": {"small_pipe_slope": 0.0208, "med_pipe_slope": 0.0104, "large_pipe_slope": 0.0052},
+      "tags": ["plumbing", "drainage", "sanitary", "slope", "ipc", "sewer"]
+    },
+    {
+      "id": "INTL-AM-DFAM",
+      "jurisdiction": "INTL",
+      "discipline": "fabrication",
+      "standard": "ISO/ASTM 52910 Design for Additive Manufacturing",
+      "title": "3D Printing (FDM / SLS) Wall Thickness, Overhang & Clearance Rules",
+      "summary": "Watertight manifold mesh required; FDM min wall >= 0.8–1.2 mm (2-3 perimeters), overhang <= 45° without supports, moving-part clearance >= 0.3–0.4 mm.",
+      "details": "Before slicing to 3MF/STL: verify zero boundary edges, zero non-manifold edges, positive outward normals. For FDM (0.4 mm nozzle): min feature 0.8 mm, snap-fit clearance 0.2 mm, print-in-place hinge clearance 0.35–0.5 mm. For SLS PA12: min wall 0.8 mm, powder escape holes >= 4 mm.",
+      "formula": "wall >= 2 * nozzle_d; clearance_moving >= 0.35 mm; overhang <= 45 deg",
+      "parameters": {"fdm_min_wall_mm": 0.8, "fdm_max_overhang_deg": 45.0, "fdm_clearance_mm": 0.35},
+      "tags": ["3d printing", "fdm", "sls", "3mf", "manifold", "tolerance", "clearance", "dfam"]
+    },
+    {
+      "id": "SPACE-NASA-5001B",
+      "jurisdiction": "SPACE-NASA",
+      "discipline": "aerospace",
+      "standard": "NASA-STD-5001B & NASA-STD-3001",
+      "title": "Spacecraft / Pressurized Habitat Structural Factors of Safety & Radiation Shielding",
+      "summary": "Metallic flight structures: Yield FS >= 1.1–1.25, Ultimate FS >= 1.4–1.5; Pressurized crew habitats: Ultimate FS >= 2.0 on proof/burst; Lunar/Mars GCR/SPE shielding target >= 20–50 g/cm^2 (up to 400 g/cm^2 regolith vaults).",
+      "details": "For human-rated planetary pressurized habitats, combine internal pressure loads (typically 56–101 kPa) with planetary gravity regolith overburden (g_moon = 1.62 m/s^2, g_mars = 3.72 m/s^2) and extreme radiative thermal cycling (100–400 K on Moon). Minimum 20 g/cm^2 hydrogen-rich shielding (water/ice/polyethylene) protects against solar particle events (SPE); 2–3 m sintered lunar regolith (~450–700 g/cm^2) provides long-term GCR protection.",
+      "formula": "FS_yield >= 1.25; FS_ult_metallic >= 1.4; FS_pressure_habitat >= 2.0; areal_density = rho * thickness",
+      "parameters": {"fs_yield": 1.25, "fs_ult_flight": 1.4, "fs_habitat_pressure": 2.0, "spe_shield_g_cm2": 20.0},
+      "tags": ["nasa", "space", "lunar", "mars", "habitat", "radiation", "isru", "pressure vessel"]
+    }
+  ]
+}

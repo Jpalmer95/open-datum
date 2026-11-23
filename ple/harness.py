@@ -22,6 +22,7 @@ if str(REPO_ROOT / "python") not in sys.path:
 
 from opendatum.cad_bridges import cad_capabilities, extract_dxf_takeoff, inspect_step_file
 from opendatum.codes import CodesEngine
+from opendatum.docs_engine import audit_spreadsheet
 from opendatum.spatial import SpatialHub
 
 SPATIAL_EXTS = {".dxf", ".ifc", ".step", ".stp", ".obj", ".stl", ".odir.json", ".3mf", ".gltf"}
@@ -185,6 +186,18 @@ def verify_deliverables(workspace_dir: str | Path, min_clearance: float = 0.05) 
             if not ok:
                 errors += 1
             checks.append({"file": rel, "status": "pass" if ok else "fail", "type": "ifc_step_spf"})
+        elif ext in {".xlsx", ".csv"}:
+            audit = audit_spreadsheet(p)
+            if not audit["pass"]:
+                errors += 1
+            checks.append(
+                {
+                    "file": rel,
+                    "status": "pass" if audit["pass"] else "fail",
+                    "type": f"spreadsheet_{ext.lstrip('.')}",
+                    "error_cells": len(audit["error_cells"]),
+                }
+            )
 
     return {
         "workspace": str(root),

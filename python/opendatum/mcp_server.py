@@ -20,9 +20,13 @@ from .cad_bridges import (
     inspect_step_file,
 )
 from .codes import CodesEngine
+from .docs_engine import audit_spreadsheet, ingest_spec_document_to_codes
+from .fea import solve_2d_truss_fea, solve_psychrometrics_ashrae
 from .materials import MaterialsDB
+from .renderer import render_spatial_views
 from .solvers import EngineeringSolvers
 from .spatial import SpatialHub
+from .tables import StandardTables
 from .units import convert_unit
 
 
@@ -40,6 +44,7 @@ class OpenDatumMCPServer:
         self.materials = MaterialsDB()
         self.codes = CodesEngine()
         self.solvers = EngineeringSolvers(self.materials)
+        self.tables = StandardTables(self.materials)
         self._spatial: SpatialHub | None = None
         self.tools: Dict[str, Dict[str, Any]] = {}
         self._register_all_tools()
@@ -221,7 +226,7 @@ class OpenDatumMCPServer:
         )
         self._register(
             "ple_verify_deliverables",
-            "Pre-submission QA gate verifying deliverables (.odir.json clash-free, valid JSON, non-empty DXF/IFC schemas) before grading or handoff.",
+            "Pre-submission QA gate verifying deliverables (.odir.json clash-free, valid JSON, non-empty DXF/IFC schemas, clean XLSX/CSV formulas) before grading or handoff.",
             {
                 "type": "object",
                 "properties": {
@@ -233,6 +238,122 @@ class OpenDatumMCPServer:
             lambda a: _ple_harness_import()[1](
                 a["workspace_dir"], float(a.get("min_clearance", 0.05))
             ),
+        )
+        self._register(
+            "spatial_render_views",
+            "Render orthographic Plan & Elevation SVG + PNG diagnostic drawings with color-coded disciplines and red clash boxes for visual inspection.",
+            {
+                "type": "object",
+                "properties": {
+                    "input_path": {"type": "string"},
+                    "output_dir": {"type": "string"},
+                    "view": {"type": "string", "default": "both"},
+                    "clearance": {"type": "number", "default": 0.05},
+                },
+                "required": ["input_path", "output_dir"],
+            },
+            lambda a: render_spatial_views(
+                a["input_path"],
+                a["output_dir"],
+                view=a.get("view", "both"),
+                clearance=float(a.get("clearance", 0.05)),
+            ),
+        )
+        self._register(
+            "doc_audit_spreadsheet",
+            "Audit an engineering .xlsx or .csv BOQ/schedule for Excel formula errors (#REF!, #DIV/0!, #VALUE!, #NAME?, #N/A) and formula integrity.",
+            {
+                "type": "object",
+                "properties": {"path": {"type": "string"}},
+                "required": ["path"],
+            },
+            lambda a: audit_spreadsheet(a["path"]),
+        )
+        self._register(
+            "doc_ingest_spec_to_codes",
+            "Chunk and index a project specification (.md, .txt, or .pdf) into OpenDatum's local SQLite FTS5 CodesEngine under a PROJECT jurisdiction overlay.",
+            {
+                "type": "object",
+                "properties": {
+                    "doc_path": {"type": "string"},
+                    "jurisdiction_code": {"type": "string", "default": "PROJECT"},
+                    "parent_jurisdiction": {"type": "string", "default": "US"},
+                    "discipline": {"type": "string", "default": "generic"},
+                },
+                "required": ["doc_path"],
+            },
+            lambda a: ingest_spec_document_to_codes(
+                a["doc_path"],
+                self.codes,
+                jurisdiction_code=a.get("jurisdiction_code", "PROJECT"),
+                parent_jurisdiction=a.get("parent_jurisdiction", "US"),
+                discipline=a.get("discipline", "generic"),
+            ),
+        )
+        self._register(
+            "table_select_steel_beam",
+            "Select the lightest (most cost-efficient) AISC W-shape steel beam satisfying LRFD flexure & L/360 deflection including self-weight.",
+            {
+                "type": "object",
+                "properties": {
+                    "span_m": {"type": "number"},
+                    "uniform_load_kn_m": {"type": "number"},
+                    "material_id": {"type": "string", "default": "steel_a992"},
+                    "deflection_limit_ratio": {"type": "number", "default": 360.0},
+                    "max_depth_mm": {"type": "number"},
+                    "environment": {"type": "string", "default": "earth_sea_level"},
+                },
+                "required": ["span_m", "uniform_load_kn_m"],
+            },
+            lambda a: self.tables.select_lightest_steel_beam(**a),
+        )
+        self._register(
+            "table_select_nec_feeder",
+            "Select minimum NEC Table 310.16 THHN conductor size and EMT conduit trade size satisfying 125% continuous load, ambient/bundling derating, voltage drop, and Ch. 9 fill.",
+            {
+                "type": "object",
+                "properties": {
+                    "voltage_v": {"type": "number"},
+                    "current_a": {"type": "number"},
+                    "one_way_length_m": {"type": "number"},
+                    "phases": {"type": "integer", "default": 3},
+                    "conductor_material": {"type": "string", "default": "copper"},
+                    "conductor_count_in_conduit": {"type": "integer", "default": 4},
+                    "ambient_temp_c": {"type": "number", "default": 30.0},
+                    "continuous_load": {"type": "boolean", "default": True},
+                    "max_vd_pct": {"type": "number", "default": 3.0},
+                },
+                "required": ["voltage_v", "current_a", "one_way_length_m"],
+            },
+            lambda a: self.tables.select_nec_feeder_and_conduit(**a),
+        )
+        self._register(
+            "solve_2d_truss_fea",
+            "Exact 2D pin-jointed truss direct-stiffness matrix FEA solver returning nodal displacements, support reactions, member axial forces, stresses, and pass/fail utilization.",
+            {
+                "type": "object",
+                "properties": {
+                    "nodes": {"type": "array"},
+                    "elements": {"type": "array"},
+                    "loads": {"type": "array"},
+                },
+                "required": ["nodes", "elements", "loads"],
+            },
+            lambda a: solve_2d_truss_fea(a["nodes"], a["elements"], a["loads"], self.materials),
+        )
+        self._register(
+            "solve_psychrometrics",
+            "ASHRAE Fundamentals moist-air psychrometric state calculator (humidity ratio, enthalpy, specific volume, dew point, wet-bulb).",
+            {
+                "type": "object",
+                "properties": {
+                    "dry_bulb_c": {"type": "number"},
+                    "relative_humidity_pct": {"type": "number"},
+                    "pressure_pa": {"type": "number", "default": 101325.0},
+                },
+                "required": ["dry_bulb_c", "relative_humidity_pct"],
+            },
+            lambda a: solve_psychrometrics_ashrae(**a),
         )
 
         # ---- Materials Substrate ----

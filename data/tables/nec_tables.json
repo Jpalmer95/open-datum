@@ -1,0 +1,33 @@
+{
+  "schema_version": "0.3.0",
+  "source": "NEC NFPA 70 reference conductor sizing (Table 310.16 / Ch. 9 nominal engineering values)",
+  "conductors": [
+    {"size": "14 AWG",   "area_mm2": 2.08,  "thhn_area_mm2": 6.26,   "cu_amp_60c": 15,  "cu_amp_75c": 20,  "cu_amp_90c": 25,  "al_amp_75c": null, "r_cu_ohm_km": 10.17, "r_al_ohm_km": null},
+    {"size": "12 AWG",   "area_mm2": 3.31,  "thhn_area_mm2": 8.58,   "cu_amp_60c": 20,  "cu_amp_75c": 25,  "cu_amp_90c": 30,  "al_amp_75c": 20,   "r_cu_ohm_km": 6.56,  "r_al_ohm_km": 10.50},
+    {"size": "10 AWG",   "area_mm2": 5.26,  "thhn_area_mm2": 13.61,  "cu_amp_60c": 30,  "cu_amp_75c": 35,  "cu_amp_90c": 40,  "al_amp_75c": 30,   "r_cu_ohm_km": 3.94,  "r_al_ohm_km": 6.56},
+    {"size": "8 AWG",    "area_mm2": 8.37,  "thhn_area_mm2": 23.61,  "cu_amp_60c": 40,  "cu_amp_75c": 50,  "cu_amp_90c": 55,  "al_amp_75c": 40,   "r_cu_ohm_km": 2.56,  "r_al_ohm_km": 4.27},
+    {"size": "6 AWG",    "area_mm2": 13.30, "thhn_area_mm2": 32.71,  "cu_amp_60c": 55,  "cu_amp_75c": 65,  "cu_amp_90c": 75,  "al_amp_75c": 50,   "r_cu_ohm_km": 1.61,  "r_al_ohm_km": 2.66},
+    {"size": "4 AWG",    "area_mm2": 21.15, "thhn_area_mm2": 53.16,  "cu_amp_60c": 70,  "cu_amp_75c": 85,  "cu_amp_90c": 95,  "al_amp_75c": 65,   "r_cu_ohm_km": 1.02,  "r_al_ohm_km": 1.67},
+    {"size": "3 AWG",    "area_mm2": 26.67, "thhn_area_mm2": 62.77,  "cu_amp_60c": 85,  "cu_amp_75c": 100, "cu_amp_90c": 115, "al_amp_75c": 75,   "r_cu_ohm_km": 0.82,  "r_al_ohm_km": 1.31},
+    {"size": "2 AWG",    "area_mm2": 33.62, "thhn_area_mm2": 74.71,  "cu_amp_60c": 95,  "cu_amp_75c": 115, "cu_amp_90c": 130, "al_amp_75c": 90,   "r_cu_ohm_km": 0.66,  "r_al_ohm_km": 1.05},
+    {"size": "1 AWG",    "area_mm2": 42.41, "thhn_area_mm2": 100.8,  "cu_amp_60c": 110, "cu_amp_75c": 130, "cu_amp_90c": 145, "al_amp_75c": 100,  "r_cu_ohm_km": 0.52,  "r_al_ohm_km": 0.85},
+    {"size": "1/0 AWG",  "area_mm2": 53.49, "thhn_area_mm2": 119.7,  "cu_amp_60c": 125, "cu_amp_75c": 150, "cu_amp_90c": 170, "al_amp_75c": 120,  "r_cu_ohm_km": 0.42,  "r_al_ohm_km": 0.66},
+    {"size": "2/0 AWG",  "area_mm2": 67.43, "thhn_area_mm2": 143.4,  "cu_amp_60c": 145, "cu_amp_75c": 175, "cu_amp_90c": 195, "al_amp_75c": 135,  "r_cu_ohm_km": 0.33,  "r_al_ohm_km": 0.52},
+    {"size": "3/0 AWG",  "area_mm2": 85.01, "thhn_area_mm2": 172.8,  "cu_amp_60c": 165, "cu_amp_75c": 200, "cu_amp_90c": 225, "al_amp_75c": 155,  "r_cu_ohm_km": 0.26,  "r_al_ohm_km": 0.43},
+    {"size": "4/0 AWG",  "area_mm2": 107.2, "thhn_area_mm2": 208.8,  "cu_amp_60c": 195, "cu_amp_75c": 230, "cu_amp_90c": 260, "al_amp_75c": 180,  "r_cu_ohm_km": 0.21,  "r_al_ohm_km": 0.34},
+    {"size": "250 kcmil","area_mm2": 126.7, "thhn_area_mm2": 256.1,  "cu_amp_60c": 215, "cu_amp_75c": 255, "cu_amp_90c": 290, "al_amp_75c": 205,  "r_cu_ohm_km": 0.18,  "r_al_ohm_km": 0.29},
+    {"size": "350 kcmil","area_mm2": 177.3, "thhn_area_mm2": 338.2,  "cu_amp_60c": 260, "cu_amp_75c": 310, "cu_amp_90c": 350, "al_amp_75c": 250,  "r_cu_ohm_km": 0.13,  "r_al_ohm_km": 0.21},
+    {"size": "500 kcmil","area_mm2": 253.4, "thhn_area_mm2": 456.3,  "cu_amp_60c": 320, "cu_amp_75c": 380, "cu_amp_90c": 430, "al_amp_75c": 310,  "r_cu_ohm_km": 0.095, "r_al_ohm_km": 0.15}
+  ],
+  "emt_conduits": [
+    {"trade_size": "1/2 in",   "internal_area_mm2": 196.0},
+    {"trade_size": "3/4 in",   "internal_area_mm2": 344.0},
+    {"trade_size": "1 in",     "internal_area_mm2": 558.0},
+    {"trade_size": "1-1/4 in", "internal_area_mm2": 965.0},
+    {"trade_size": "1-1/2 in", "internal_area_mm2": 1314.0},
+    {"trade_size": "2 in",     "internal_area_mm2": 2165.0},
+    {"trade_size": "2-1/2 in", "internal_area_mm2": 3778.0},
+    {"trade_size": "3 in",     "internal_area_mm2": 5701.0},
+    {"trade_size": "4 in",     "internal_area_mm2": 9521.0}
+  ]
+}
